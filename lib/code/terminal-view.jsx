@@ -20,8 +20,6 @@ export default function TerminalView({ codeWorkspaceId }) {
   const retryTimer = useRef(null);
   const statusRef = useRef(null);
   const [connected, setConnected] = useState(false);
-  const [containerStatus, setContainerStatus] = useState('checking');
-  const [containerError, setContainerError] = useState(null);
 
   const setStatus = useCallback((color) => {
     if (statusRef.current) statusRef.current.style.backgroundColor = color;
@@ -136,36 +134,9 @@ export default function TerminalView({ codeWorkspaceId }) {
 
     (async () => {
       try {
-        setContainerStatus('checking');
-        const result = await ensureCodeWorkspaceContainer(codeWorkspaceId);
-
-        if (cancelled) return;
-
-        if (result.status === 'error') {
-          setContainerStatus('error');
-          setContainerError(result.message);
-          return;
-        }
-
-        if (result.status === 'no_container') {
-          setContainerStatus('error');
-          setContainerError('No container associated with this workspace');
-          return;
-        }
-
-        if (result.status === 'started' || result.status === 'created') {
-          await new Promise((r) => setTimeout(r, 2000));
-        }
-
-        if (cancelled) return;
-        setContainerStatus('ready');
-        connect();
-      } catch {
-        if (!cancelled) {
-          setContainerStatus('error');
-          setContainerError('Failed to check workspace container');
-        }
-      }
+        await ensureCodeWorkspaceContainer(codeWorkspaceId);
+      } catch {}
+      if (!cancelled) connect();
     })();
 
     return () => {
@@ -181,35 +152,8 @@ export default function TerminalView({ codeWorkspaceId }) {
   const handleReconnect = async () => {
     clearTimeout(retryTimer.current);
     if (wsRef.current) wsRef.current.close();
-
-    setContainerStatus('checking');
-    setContainerError(null);
-
-    try {
-      const result = await ensureCodeWorkspaceContainer(codeWorkspaceId);
-
-      if (result.status === 'error') {
-        setContainerStatus('error');
-        setContainerError(result.message);
-        return;
-      }
-
-      if (result.status === 'no_container') {
-        setContainerStatus('error');
-        setContainerError('No container associated with this workspace');
-        return;
-      }
-
-      if (result.status === 'started' || result.status === 'created') {
-        await new Promise((r) => setTimeout(r, 2000));
-      }
-
-      setContainerStatus('ready');
-      connect();
-    } catch {
-      setContainerStatus('error');
-      setContainerError('Failed to check workspace container');
-    }
+    try { await ensureCodeWorkspaceContainer(codeWorkspaceId); } catch {}
+    connect();
   };
 
   return (
@@ -232,16 +176,7 @@ export default function TerminalView({ codeWorkspaceId }) {
             textAlign: 'center',
             maxWidth: 320,
           }}>
-            {containerStatus === 'checking' && 'Checking workspace...'}
-            {containerStatus === 'ready' && 'Connecting...'}
-            {containerStatus === 'error' && (
-              <div>
-                <div>Failed to start workspace</div>
-                {containerError && (
-                  <div style={{ fontSize: 12, color: '#666', marginTop: 4 }}>{containerError}</div>
-                )}
-              </div>
-            )}
+            Loading...
           </div>
         )}
       </div>

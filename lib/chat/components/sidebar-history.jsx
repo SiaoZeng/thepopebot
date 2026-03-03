@@ -79,7 +79,10 @@ const isCodeChat = (chat) => Boolean(chat.codeWorkspaceId && chat.containerName)
 export function SidebarHistory() {
   const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('all');
+  const [filter, setFilter] = useState(() => {
+    try { const v = localStorage.getItem('sidebar-chat-filter'); return v === 'chat' || v === 'code' ? v : 'all'; } catch { return 'all'; }
+  });
+  const updateFilter = (v) => { setFilter(v); try { localStorage.setItem('sidebar-chat-filter', v); } catch {} };
   const { activeChatId, navigateToChat } = useChatNav();
 
   const loadChats = async () => {
@@ -137,7 +140,7 @@ export function SidebarHistory() {
     return (
       <SidebarGroup>
         <SidebarGroupContent>
-          <ChatTypeFilter filter={filter} setFilter={setFilter} />
+          <ChatTypeFilter filter={filter} setFilter={updateFilter} />
           <div className="flex flex-col gap-2 px-2">
             {[...Array(5)].map((_, i) => (
               <div key={i} className="h-8 animate-pulse rounded-md bg-border/50" />
@@ -171,7 +174,7 @@ export function SidebarHistory() {
     <>
       <SidebarGroup>
         <SidebarGroupContent>
-          <ChatTypeFilter filter={filter} setFilter={setFilter} />
+          <ChatTypeFilter filter={filter} setFilter={updateFilter} />
         </SidebarGroupContent>
       </SidebarGroup>
       {hasResults ? (
