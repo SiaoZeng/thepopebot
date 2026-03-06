@@ -297,7 +297,7 @@ export function ClusterPage({ session, clusterId }) {
       {/* System Prompt */}
       <div className="mb-6">
         <label className="text-sm font-medium block mb-1">System Prompt</label>
-        <p className="text-xs text-muted-foreground mb-2">Shared instructions applied to all workers in this cluster.</p>
+        <p className="text-xs text-muted-foreground mb-2">Define the cluster's mission, goals, and shared instructions. This is prepended to every worker's prompt along with the workspace structure and their assigned role.</p>
         <textarea
           value={systemPromptValue}
           onChange={(e) => setSystemPromptValue(e.target.value)}
@@ -491,12 +491,12 @@ function WorkerRow({ worker, roles, running, onAssignRole, onRename, onUpdateTri
 
   return (
     <div className="rounded-lg border bg-card p-4">
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center justify-center px-2 h-6 rounded bg-muted text-xs font-mono font-medium shrink-0">
           {shortId}
         </div>
 
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 basis-full md:basis-32">
           <div className="flex items-center gap-2">
             {editingName ? (
               <input

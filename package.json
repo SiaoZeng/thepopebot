@@ -43,6 +43,7 @@
     "postinstall": "node -e \"import('./bin/postinstall.js').catch(()=>{})\"",
     "db:generate": "drizzle-kit generate",
     "db:studio": "drizzle-kit studio",
+    "docker:build": "node bin/docker-build.js",
     "test": "echo \"No tests yet\" && exit 0",
     "sync": "node bin/cli.js sync"
   },

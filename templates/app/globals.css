@@ -101,3 +101,14 @@
 button, a, [role="button"] {
   -webkit-tap-highlight-color: transparent;
 }
+
+/* Prevent button text from wrapping */
+button, [role="button"] {
+  white-space: nowrap;
+}
+
+/* Prevent long text from causing horizontal overflow on mobile */
+body {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}

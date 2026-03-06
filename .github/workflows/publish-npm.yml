@@ -72,6 +72,9 @@ jobs:
           - image: claude-code-headless
             context: templates/docker/claude-code-headless
             dockerfile: templates/docker/claude-code-headless/Dockerfile
+          - image: claude-code-cluster-worker
+            context: templates/docker/claude-code-cluster-worker
+            dockerfile: templates/docker/claude-code-cluster-worker/Dockerfile
           - image: event-handler
             context: .
             dockerfile: templates/docker/event-handler/Dockerfile

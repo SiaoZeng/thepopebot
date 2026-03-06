@@ -21,7 +21,7 @@ export function PageLayout({ session, children, contentClassName }) {
           <div className="sticky top-0 z-10 flex items-center bg-background px-2 py-1.5 md:hidden">
             <SidebarTrigger />
           </div>
-          <div className={contentClassName || "flex flex-col h-full max-w-4xl mx-auto w-full px-4 py-6"}>
+          <div className={contentClassName || "flex flex-col h-full max-w-4xl mx-auto w-full min-w-0 px-4 py-6"}>
             {children}
           </div>
         </SidebarInset>

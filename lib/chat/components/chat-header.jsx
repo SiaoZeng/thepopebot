@@ -105,7 +105,7 @@ export function ChatHeader({ chatId: chatIdProp, workspaceId }) {
 
   return (
     <>
-      <header className="sticky top-0 flex items-center gap-2 bg-background px-2 py-1.5 md:px-2 z-10">
+      <header className="sticky top-0 flex items-center gap-2 bg-background px-2 py-1.5 md:px-2 z-10 min-w-0 overflow-hidden">
         {/* Mobile-only: open sidebar sheet */}
         <div className="md:hidden">
           <SidebarTrigger />
@@ -122,10 +122,10 @@ export function ChatHeader({ chatId: chatIdProp, workspaceId }) {
               if (e.key === 'Escape') cancelEdit();
             }}
             onBlur={saveEdit}
-            className="text-base font-medium text-foreground bg-background rounded-md border border-ring px-2 py-0.5 outline-none ring-2 ring-ring/30"
+            className="text-base font-medium text-foreground bg-background rounded-md border border-ring px-2 py-0.5 outline-none ring-2 ring-ring/30 min-w-0 w-full"
           />
         ) : showControls ? (
-          <div className="group/title flex items-center gap-0.5 rounded-md px-1.5 py-0.5 hover:bg-muted transition-colors">
+          <div className="group/title flex items-center gap-0.5 rounded-md px-1.5 py-0.5 hover:bg-muted transition-colors min-w-0">
             <h1
               className="text-base font-medium text-muted-foreground truncate cursor-pointer"
               onClick={enterEditMode}
@@ -138,7 +138,7 @@ export function ChatHeader({ chatId: chatIdProp, workspaceId }) {
                   <ChevronDownIcon size={14} />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
+              <DropdownMenuContent align="end" className="min-w-[150px]">
                 <DropdownMenuItem onClick={handleStar}>
                   {starred ? <StarFilledIcon size={14} /> : <StarIcon size={14} />}
                   <span>{starred ? 'Unstar' : 'Star'}</span>

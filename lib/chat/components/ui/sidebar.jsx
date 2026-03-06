@@ -208,7 +208,7 @@ export function SidebarGroupContent({ children, className }) {
 
 export function SidebarInset({ children, className }) {
   return (
-    <main className={cn('relative flex min-h-svh flex-1 flex-col bg-background', className)}>
+    <main className={cn('relative flex min-h-svh flex-1 flex-col bg-background overflow-x-hidden', className)}>
       {children}
     </main>
   );

@@ -70,8 +70,8 @@ export function NotificationsPage({ session }) {
               <div className="mt-0.5 shrink-0 text-muted-foreground">
                 <BellIcon size={16} />
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm prose-sm">
+              <div className="flex-1 min-w-0 overflow-hidden">
+                <div className="text-sm prose-sm overflow-hidden">
                   <Streamdown mode="static" linkSafety={linkSafety}>{n.notification}</Streamdown>
                 </div>
                 <span className="text-xs text-muted-foreground">

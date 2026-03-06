@@ -48,7 +48,7 @@ export function SidebarHistoryItem({ chat, isActive, onDelete, onStar, onRename 
 
         <div className={cn(
           'absolute right-1 top-1/2 -translate-y-1/2 z-10',
-          showMenu ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          showMenu ? 'opacity-100' : 'opacity-100 md:opacity-0 md:pointer-events-none'
         )}>
           <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
             <DropdownMenuTrigger asChild>

@@ -278,7 +278,7 @@ function ChatRow({ chat, onNavigate, onDelete, onStar, onRename }) {
       {!editing && (
         <div className={cn(
           'shrink-0',
-          showMenu ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          showMenu ? 'opacity-100' : 'opacity-100 md:opacity-0 md:pointer-events-none'
         )}>
           <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
             <DropdownMenuTrigger asChild>

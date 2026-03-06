@@ -41,7 +41,7 @@ export function RenameDialog({ open, onSave, onCancel, title = 'Rename chat', cu
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="fixed inset-0 bg-black/50" onClick={onCancel} />
-      <div className="relative z-50 w-full max-w-sm rounded-lg border border-border bg-background p-6 shadow-lg" onClick={(e) => e.stopPropagation()}>
+      <div className="relative z-50 w-full max-w-sm mx-4 rounded-lg border border-border bg-background p-6 shadow-lg" onClick={(e) => e.stopPropagation()}>
         <h3 className="text-lg font-semibold">{title}</h3>
         <input
           ref={inputRef}

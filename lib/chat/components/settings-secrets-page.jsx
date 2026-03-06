@@ -182,7 +182,7 @@ function ApiKeySection() {
 
       {currentKey ? (
         <div className="rounded-lg border bg-card p-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
               <div className="shrink-0 rounded-md bg-muted p-2">
                 <KeyIcon size={16} />
@@ -197,7 +197,7 @@ function ApiKeySection() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={handleRegenerate}
                 disabled={creating}
