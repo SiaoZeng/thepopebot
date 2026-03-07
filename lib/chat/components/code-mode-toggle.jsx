@@ -87,8 +87,8 @@ export function CodeModeToggle({
     try {
       // Only launch interactive mode — closing is handled from the code page
       const { startInteractiveMode } = await import('../../code/actions.js');
-      await startInteractiveMode(workspace.id);
-      if (onWorkspaceUpdate) await onWorkspaceUpdate();
+      const result = await startInteractiveMode(workspace.id);
+      if (result.containerName && onWorkspaceUpdate) onWorkspaceUpdate(result.containerName);
     } catch (err) {
       console.error('Failed to toggle mode:', err);
     } finally {

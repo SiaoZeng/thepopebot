@@ -8,7 +8,7 @@ import { ChatInput } from './chat-input.js';
 import { ChatHeader } from './chat-header.js';
 import { Greeting } from './greeting.js';
 import { CodeModeToggle } from './code-mode-toggle.js';
-import { getRepositories, getBranches, getWorkspace, createChatWorkspace } from '../actions.js';
+import { getRepositories, getBranches } from '../actions.js';
 
 export function Chat({ chatId, initialMessages = [], workspace = null }) {
   const [input, setInput] = useState('');
@@ -30,12 +30,6 @@ export function Chat({ chatId, initialMessages = [], workspace = null }) {
       window.location.href = `/code/${workspaceState.id}`;
     }
   }, [workspaceState?.containerName]);
-
-  const refreshWorkspace = useCallback(async () => {
-    if (!workspaceState?.id) return;
-    const ws = await getWorkspace(workspaceState.id);
-    if (ws) setWorkspaceState(ws);
-  }, [workspaceState?.id]);
 
   const codeModeRef = useRef({ codeMode, repo, branch, workspaceId: workspaceState?.id });
   codeModeRef.current = { codeMode, repo, branch, workspaceId: workspaceState?.id };
@@ -85,18 +79,6 @@ export function Chat({ chatId, initialMessages = [], workspace = null }) {
     setInput('');
     setFiles([]);
 
-    // Create workspace before first message if code mode is on
-    if (codeMode && repo && branch && !workspaceState?.id) {
-      try {
-        const ws = await createChatWorkspace(repo, branch);
-        setWorkspaceState(ws);
-        // Update ref immediately so transport body includes workspaceId
-        codeModeRef.current = { ...codeModeRef.current, workspaceId: ws.id };
-      } catch (err) {
-        console.error('Failed to create workspace:', err);
-      }
-    }
-
     const fileParts = currentFiles.map((f) => ({
       type: 'file',
       mediaType: f.file.type || 'text/plain',
@@ -106,19 +88,21 @@ export function Chat({ chatId, initialMessages = [], workspace = null }) {
     await sendMessage({ text: text || undefined, files: fileParts });
 
     if (isFirstMessage && text) {
-      fetch('/chat/generate-chat-title', {
+      fetch('/chat/finalize-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chatId, message: text }),
       })
         .then(res => res.json())
-        .then(({ title }) => {
+        .then(({ title, codeWorkspaceId, featureBranch }) => {
           if (title) {
             window.dispatchEvent(new CustomEvent('chatTitleUpdated', { detail: { chatId, title } }));
           }
-          refreshWorkspace();
+          if (codeWorkspaceId) {
+            setWorkspaceState({ id: codeWorkspaceId, featureBranch, repo, branch, containerName: null });
+          }
         })
-        .catch(err => console.error('Failed to generate title:', err));
+        .catch(err => console.error('Failed to finalize chat:', err));
     }
   };
 
@@ -174,7 +158,9 @@ export function Chat({ chatId, initialMessages = [], workspace = null }) {
       getBranches={getBranches}
       workspace={workspaceState}
       isInteractiveActive={isInteractiveActive}
-      onWorkspaceUpdate={refreshWorkspace}
+      onWorkspaceUpdate={(containerName) => {
+        setWorkspaceState(prev => ({ ...prev, containerName }));
+      }}
     />
   );
 
