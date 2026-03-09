@@ -44,11 +44,9 @@ ENDJSON
 # Switch to best-effort mode for logging + claude execution
 set +e
 
-# Create log session dir (best-effort)
-SESSION_TS=$(date -u +%Y-%m-%d_%H-%M-%S)
-LOG_DIR="logs/role-${ROLE_SHORT_ID}/${SESSION_TS}_${WORKER_UUID}"
+# Use log dir created by event handler (passed as env var)
 LOG_READY=false
-if mkdir -p "$LOG_DIR" 2>/dev/null; then
+if [ -n "$LOG_DIR" ] && mkdir -p "$LOG_DIR" 2>/dev/null; then
     LOG_READY=true
 fi
 
