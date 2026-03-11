@@ -132,6 +132,31 @@ async function init() {
   const skipped = [];
   const changed = [];
   const updated = [];
+  const backedUp = [];
+
+  let backupDir = null;
+  function getBackupDir() {
+    if (!backupDir) {
+      const now = new Date();
+      const ts = now.getFullYear().toString()
+        + String(now.getMonth() + 1).padStart(2, '0')
+        + String(now.getDate()).padStart(2, '0')
+        + '-'
+        + String(now.getHours()).padStart(2, '0')
+        + String(now.getMinutes()).padStart(2, '0')
+        + String(now.getSeconds()).padStart(2, '0');
+      backupDir = path.join(cwd, '.backups', ts);
+    }
+    return backupDir;
+  }
+
+  function backupFile(filePath, relPath) {
+    const bd = getBackupDir();
+    const dest = path.join(bd, relPath);
+    fs.mkdirSync(path.dirname(dest), { recursive: true });
+    fs.copyFileSync(filePath, dest);
+    backedUp.push(relPath);
+  }
 
   for (const relPath of templateFiles) {
     const src = path.join(templatesDir, relPath);
@@ -151,7 +176,8 @@ async function init() {
       if (srcContent.equals(destContent)) {
         skipped.push(outPath);
       } else if (!noManaged && isManaged(outPath)) {
-        // Managed file differs — auto-update to match package
+        // Managed file differs — back up before overwriting
+        backupFile(dest, outPath);
         fs.mkdirSync(path.dirname(dest), { recursive: true });
         fs.copyFileSync(src, dest);
         updated.push(outPath);
@@ -184,6 +210,7 @@ async function init() {
             const tmplPath = templatePath(relPath, templatesDir);
             const templateExists = fs.existsSync(path.join(templatesDir, tmplPath));
             if (!templateExists) {
+              backupFile(fullPath, relPath);
               fs.unlinkSync(fullPath);
               deleted.push(relPath);
               console.log(`  Deleted ${relPath} (stale managed file)`);
@@ -281,6 +308,11 @@ async function init() {
     fs.mkdirSync(path.dirname(claudeSkillsLink), { recursive: true });
     createDirLink('../skills/active', claudeSkillsLink);
     console.log('  Created .claude/skills → ../skills/active');
+  }
+
+  // Report backed-up files
+  if (backedUp.length > 0) {
+    console.log(`\n  Backed up ${backedUp.length} file(s) to ${path.relative(cwd, backupDir)}/`);
   }
 
   // Report updated managed files
