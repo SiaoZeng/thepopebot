@@ -3,10 +3,13 @@
 import { useState, useEffect } from 'react';
 import { getGeneralSettings, updateGeneralSetting } from '../actions.js';
 
-export function SettingsGeneralPage() {
+export function SettingsGeneralPage({ session }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [includeBeta, setIncludeBeta] = useState(false);
+  const [emailAddress, setEmailAddress] = useState(session?.user?.email || '');
+  const [emailSigningUp, setEmailSigningUp] = useState(false);
+  const [emailSubscribed, setEmailSubscribed] = useState(false);
 
   useEffect(() => {
     getGeneralSettings().then((result) => {
@@ -102,6 +105,58 @@ export function SettingsGeneralPage() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Email Updates */}
+      <div>
+        <div className="mb-4">
+          <h2 className="text-base font-medium">Email Updates</h2>
+          <p className="text-sm text-muted-foreground">
+            Get urgent updates and features.
+          </p>
+        </div>
+
+        <div className="rounded-lg border bg-card p-4 space-y-4">
+          <div className="space-y-2">
+            <label className="text-sm text-muted-foreground">Email</label>
+            <input
+              type="email"
+              value={emailAddress}
+              onChange={(e) => setEmailAddress(e.target.value)}
+              className="w-full rounded-md border border-border bg-input px-3 py-2 text-sm"
+            />
+          </div>
+
+          {emailSubscribed ? (
+            <div className="rounded-lg border border-green-500/30 bg-green-500/5 p-4">
+              <p className="text-sm font-medium text-green-500">Subscribed</p>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <button
+                onClick={async () => {
+                  setEmailSigningUp(true);
+                  try {
+                    await fetch('https://app.convertkit.com/forms/9208367/subscriptions', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                      body: 'email_address=' + encodeURIComponent(emailAddress),
+                      redirect: 'manual',
+                    });
+                  } catch {
+                    // Never block on failure
+                  }
+                  setEmailSigningUp(false);
+                  setEmailSubscribed(true);
+                }}
+                disabled={emailSigningUp}
+                className="px-3 py-1.5 text-sm font-medium rounded-md bg-foreground text-background hover:bg-foreground/90 disabled:opacity-50 transition-colors"
+              >
+                {emailSigningUp ? 'Signing up...' : 'Sign Up'}
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

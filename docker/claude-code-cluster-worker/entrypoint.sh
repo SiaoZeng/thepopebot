@@ -51,7 +51,11 @@ if [ -n "$LOG_DIR" ] && mkdir -p "$LOG_DIR" 2>/dev/null; then
 fi
 
 # Build claude args
-CLAUDE_ARGS=(-p "$PROMPT" --dangerously-skip-permissions --verbose --output-format stream-json)
+if [ "$PLAN_MODE" = "1" ]; then
+    CLAUDE_ARGS=(-p "$PROMPT" --permission-mode plan --verbose --output-format stream-json)
+else
+    CLAUDE_ARGS=(-p "$PROMPT" --dangerously-skip-permissions --verbose --output-format stream-json)
+fi
 if [ -n "$SYSTEM_PROMPT" ]; then
     CLAUDE_ARGS+=(--append-system-prompt "$SYSTEM_PROMPT")
 fi

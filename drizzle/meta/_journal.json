@@ -120,6 +120,13 @@
       "when": 1773548076175,
       "tag": "0016_majestic_metal_master",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "6",
+      "when": 1773596413808,
+      "tag": "0017_smart_trauma",
+      "breakpoints": true
     }
   ]
 }

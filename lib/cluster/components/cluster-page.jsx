@@ -456,6 +456,7 @@ function RoleTabContent({ role, clusterId, status, onUpdate, onDelete }) {
   const [foldersValue, setFoldersValue] = useState(role.folders ? role.folders.join(', ') : '');
   const [maxConcurrency, setMaxConcurrency] = useState(role.maxConcurrency || 1);
   const [cleanupWorkerDir, setCleanupWorkerDir] = useState(!!role.cleanupWorkerDir);
+  const [planMode, setPlanMode] = useState(!!role.planMode);
   const nameRef = useRef(null);
 
   const tc = role.triggerConfig || {};
@@ -477,6 +478,7 @@ function RoleTabContent({ role, clusterId, status, onUpdate, onDelete }) {
     setFoldersValue(role.folders ? role.folders.join(', ') : '');
     setMaxConcurrency(role.maxConcurrency || 1);
     setCleanupWorkerDir(!!role.cleanupWorkerDir);
+    setPlanMode(!!role.planMode);
     const tc = role.triggerConfig || {};
     setCronValue(tc.cron?.schedule || '');
     setFileWatchValue(tc.file_watch?.paths || '');
@@ -582,6 +584,12 @@ function RoleTabContent({ role, clusterId, status, onUpdate, onDelete }) {
     const next = !cleanupWorkerDir;
     setCleanupWorkerDir(next);
     onUpdate(role.id, { cleanupWorkerDir: next ? 1 : 0 });
+  };
+
+  const togglePlanMode = () => {
+    const next = !planMode;
+    setPlanMode(next);
+    onUpdate(role.id, { planMode: next ? 1 : 0 });
   };
 
   const handleRun = async () => {
@@ -757,6 +765,35 @@ function RoleTabContent({ role, clusterId, status, onUpdate, onDelete }) {
             {cleanupWorkerDir ? 'On' : 'Off'}
           </span>
         </button>
+      </div>
+
+      {/* Plan Mode */}
+      <div className="mb-6">
+        <label className="text-sm font-medium block mb-1">Plan Mode</label>
+        <button
+          type="button"
+          onClick={togglePlanMode}
+          className="inline-flex items-center gap-2 group"
+          role="switch"
+          aria-checked={planMode}
+          aria-label="Use plan permission mode instead of dangerously-skip-permissions"
+        >
+          <span
+            className={`relative inline-flex h-5 w-9 shrink-0 rounded-full transition-colors duration-200 ${
+              planMode ? 'bg-primary' : 'bg-muted-foreground/30'
+            }`}
+          >
+            <span
+              className={`absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                planMode ? 'translate-x-4' : ''
+              }`}
+            />
+          </span>
+          <span className="text-xs text-muted-foreground">
+            {planMode ? 'On' : 'Off'}
+          </span>
+        </button>
+        <p className="text-xs text-muted-foreground mt-1">Use --permission-mode plan instead of --dangerously-skip-permissions</p>
       </div>
 
       <div className="border-b border-border mb-6" />

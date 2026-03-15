@@ -6,7 +6,7 @@ Two agent types, both using `createReactAgent` from `@langchain/langgraph/prebui
 
 **Job Agent** — singleton via `getJobAgent()`:
 - System prompt: `config/JOB_PLANNING.md` (rendered fresh each invocation via `render_md()`)
-- Tools: `create_job`, `get_job_status`, `get_system_technical_specs`, `get_skill_building_guide`, `get_skill_details`, + web search (if provider supports it)
+- Tools: `create_job`, `get_job_status`, `investigate_popebot_codebase`, `get_skill_building_guide`, `get_skill_details`, + web search (if provider supports it)
 - Call `resetAgent()` to clear the singleton (required if hot-reloading)
 
 **Code Agent** — per-chat via `getCodeAgent({ repo, branch, workspaceId, chatId })`:

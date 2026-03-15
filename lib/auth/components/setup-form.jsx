@@ -30,7 +30,7 @@ export function SetupForm() {
       }
 
       // Redirect to login with success indicator — admin must authenticate through the normal flow
-      router.push('/login?created=1');
+      router.push('/signup?email=' + encodeURIComponent(email));
     } catch {
       setError('Something went wrong. Please try again.');
     } finally {

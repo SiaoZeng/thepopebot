@@ -263,16 +263,6 @@ async function init() {
     console.log('  Skipped package.json (already exists)');
   }
 
-  // Create .gitkeep files for empty dirs
-  const gitkeepDirs = ['cron', 'triggers', 'logs', 'tmp', 'data', 'data/clusters'];
-  for (const dir of gitkeepDirs) {
-    const gitkeep = path.join(cwd, dir, '.gitkeep');
-    if (!fs.existsSync(gitkeep)) {
-      fs.mkdirSync(path.join(cwd, dir), { recursive: true });
-      fs.writeFileSync(gitkeep, '');
-    }
-  }
-
   // Create default skill activation symlinks
   const defaultSkills = ['browser-tools', 'llm-secrets', 'modify-self'];
   const activeDir = path.join(cwd, 'skills', 'active');
@@ -346,6 +336,7 @@ async function init() {
 
 AUTH_SECRET=${authSecret}
 AUTH_TRUST_HOST=true
+DATABASE_PATH=data/db/thepopebot.sqlite
 THEPOPEBOT_VERSION=${version}
 
 # Uncomment to use a custom docker-compose file that won't be overwritten by upgrades.

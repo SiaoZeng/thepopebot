@@ -21,12 +21,14 @@ else
     git clean -fd
 fi
 
-# Checkout feature branch (create or reset)
-if git ls-remote --heads origin "$FEATURE_BRANCH" | grep -q .; then
-    git checkout -B "$FEATURE_BRANCH" "origin/$FEATURE_BRANCH"
-else
-    git checkout -b "$FEATURE_BRANCH"
-    git push -u origin "$FEATURE_BRANCH"
+# Checkout feature branch (create or reset) — skip for investigate mode (stays on base branch)
+if [ "$HEADLESS_PERMISSION_MODE" != "investigate" ]; then
+    if git ls-remote --heads origin "$FEATURE_BRANCH" | grep -q .; then
+        git checkout -B "$FEATURE_BRANCH" "origin/$FEATURE_BRANCH"
+    else
+        git checkout -b "$FEATURE_BRANCH"
+        git push -u origin "$FEATURE_BRANCH"
+    fi
 fi
 
 WORKSPACE_DIR=$(pwd)
@@ -60,7 +62,7 @@ ENDJSON
 
 # Run Claude Code headlessly
 set +e
-if [ "$HEADLESS_PERMISSION_MODE" = "plan" ]; then
+if [ "$HEADLESS_PERMISSION_MODE" = "plan" ] || [ "$HEADLESS_PERMISSION_MODE" = "investigate" ]; then
     claude --permission-mode plan \
         -p "$HEADLESS_TASK" \
         --verbose \
@@ -73,6 +75,11 @@ else
 fi
 AGENT_EXIT=$?
 set -e
+
+# Investigate mode: read-only, no git operations
+if [ "$HEADLESS_PERMISSION_MODE" = "investigate" ]; then
+    exit $AGENT_EXIT
+fi
 
 if [ $AGENT_EXIT -eq 0 ]; then
     # Commit + merge back
