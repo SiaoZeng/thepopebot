@@ -81,11 +81,12 @@ function ToolCall({ part, className }) {
   const [expanded, setExpanded] = useState(false);
 
   const toolName = part.toolName || (part.type?.startsWith('tool-') ? part.type.slice(5) : 'tool');
-  const displayName = getToolDisplayName(toolName);
+  const isUnknown = toolName === '__unknown_event__';
+  const displayName = isUnknown ? 'Unknown Event' : getToolDisplayName(toolName);
   const state = part.state || 'input-available';
 
-  const isRunning = state === 'input-streaming' || state === 'input-available';
-  const isDone = state === 'output-available';
+  const isRunning = !isUnknown && (state === 'input-streaming' || state === 'input-available');
+  const isDone = !isUnknown && state === 'output-available';
   const isError = state === 'output-error';
 
   // Auto-redirect when start_coding completes successfully.
@@ -102,6 +103,37 @@ function ToolCall({ part, className }) {
       }
     } catch {}
   }, [toolName, isDone, part.output]);
+
+  // Unknown events: red collapsible box
+  if (isUnknown) {
+    const eventType = part.input?.type || 'unknown';
+    return (
+      <div className={`my-1 rounded-lg border border-destructive/50 bg-destructive/5${className ? ` ${className}` : ''}`}>
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-destructive/10 rounded-lg"
+        >
+          <XIcon size={14} className="text-destructive shrink-0" />
+          <span className="font-medium text-destructive">Unknown Event</span>
+          <span className="text-xs text-destructive/70">{eventType}</span>
+          <ChevronDownIcon
+            size={14}
+            className={cn(
+              'ml-auto text-destructive/70 transition-transform shrink-0',
+              expanded && 'rotate-180'
+            )}
+          />
+        </button>
+        {expanded && (
+          <div className="border-t border-destructive/30 px-3 py-2 text-xs">
+            <pre className="whitespace-pre-wrap break-all rounded bg-muted p-2 text-foreground overflow-x-auto max-h-64 overflow-y-auto">
+              {formatContent(part.output || part.input)}
+            </pre>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className={`my-1 rounded-lg border border-border bg-background${className ? ` ${className}` : ''}`}>
