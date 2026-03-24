@@ -227,8 +227,16 @@ export function CommandOutputDialog({ title, output, exitCode, running, onClose 
   );
 }
 
+const STORAGE_KEY = 'thepopebot-workspace-command';
+
 function WorkspaceCommandButton({ workspaceId, diffStats, onDiffStatsRefresh, onShowDiff }) {
-  const [selectedCommand, setSelectedCommand] = useState('create-pr');
+  const [selectedCommand, setSelectedCommandState] = useState(() => {
+    try { return localStorage.getItem(STORAGE_KEY) || 'create-pr'; } catch { return 'create-pr'; }
+  });
+  const setSelectedCommand = (cmd) => {
+    setSelectedCommandState(cmd);
+    try { localStorage.setItem(STORAGE_KEY, cmd); } catch {}
+  };
   const [commandRunning, setCommandRunning] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [commandOutput, setCommandOutput] = useState('');

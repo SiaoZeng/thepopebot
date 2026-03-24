@@ -775,8 +775,16 @@ export default function TerminalView({ codeWorkspaceId, wsPath, isActive = true,
   );
 }
 
+const STORAGE_KEY = 'thepopebot-workspace-command';
+
 function ToolbarCommandButton({ codeWorkspaceId, diffStats, onDiffStatsRefresh, onShowDiff }) {
-  const [selectedCommand, setSelectedCommand] = useState('create-pr');
+  const [selectedCommand, setSelectedCommandState] = useState(() => {
+    try { return localStorage.getItem(STORAGE_KEY) || 'create-pr'; } catch { return 'create-pr'; }
+  });
+  const setSelectedCommand = (cmd) => {
+    setSelectedCommandState(cmd);
+    try { localStorage.setItem(STORAGE_KEY, cmd); } catch {}
+  };
   const [commandRunning, setCommandRunning] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [commandOutput, setCommandOutput] = useState('');
