@@ -70,5 +70,9 @@ export async function register() {
   const { startClusterRuntime } = await import('../lib/cluster/runtime.js');
   startClusterRuntime();
 
+  // Start internal maintenance cron (cleanup expired agent job keys, etc.)
+  const { startMaintenanceCron } = await import('../lib/maintenance.js');
+  startMaintenanceCron();
+
   console.log('thepopebot initialized');
 }

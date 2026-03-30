@@ -104,6 +104,39 @@ async function handleCreateAgentJob(request) {
   }
 }
 
+async function handleGetAgentSecret(request) {
+  const key = new URL(request.url).searchParams.get('key');
+  if (!key) return Response.json({ error: 'Missing key' }, { status: 400 });
+
+  const { getAgentJobSecretRaw, setAgentJobSecret: saveSecret } = await import('../lib/db/config.js');
+  const raw = getAgentJobSecretRaw(key);
+  if (!raw) return Response.json({ error: 'Not found' }, { status: 404 });
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed.type === 'oauth2') {
+      const { refreshOAuthToken } = await import('../lib/oauth/helper.js');
+      const newToken = await refreshOAuthToken({
+        refreshToken: parsed.token.refresh_token,
+        clientId: parsed.clientId,
+        clientSecret: parsed.clientSecret,
+        tokenUrl: parsed.tokenUrl,
+      });
+      // Persist updated token (refresh token may have rotated)
+      saveSecret(key, JSON.stringify({ ...parsed, token: newToken }), 'refresh');
+      return Response.json({ value: JSON.stringify(newToken) });
+    }
+    if (parsed.type === 'oauth_token') {
+      return Response.json({ value: JSON.stringify(parsed.token) });
+    }
+    // Unknown structured value — return raw
+    return Response.json({ value: raw });
+  } catch {
+    // Plain string
+    return Response.json({ value: raw });
+  }
+}
+
 async function handleSetAgentSecret(request) {
   const body = await request.json();
   const { key, value } = body;
@@ -259,9 +292,21 @@ async function handleOAuthCallback(request) {
       redirectUri,
     });
 
-    // Save the full token JSON as the secret value
-    const tokenJson = JSON.stringify(tokenData);
-    setAgentJobSecret(state.secretName, tokenJson, 'oauth');
+    // Save token with typed wrapper so the API can auto-refresh on fetch
+    const secretType = state.secretType || 'oauth2';
+    let stored;
+    if (secretType === 'oauth_token') {
+      stored = JSON.stringify({ type: 'oauth_token', token: tokenData });
+    } else {
+      stored = JSON.stringify({
+        type: 'oauth2',
+        token: tokenData,
+        clientId: state.clientId,
+        clientSecret: state.clientSecret,
+        tokenUrl: state.tokenUrl,
+      });
+    }
+    setAgentJobSecret(state.secretName, stored, 'oauth');
 
     return oauthResultPage(true, state.secretName);
   } catch (err) {
@@ -345,6 +390,7 @@ async function GET(request) {
   switch (routePath) {
     case '/ping':               return Response.json({ message: 'Pong!' });
     case '/agent-jobs/status':  return handleAgentJobStatus(request);
+    case '/get-agent-secret':   return handleGetAgentSecret(request);
     case '/oauth/callback':     return handleOAuthCallback(request);
     default:                    return Response.json({ error: 'Not found' }, { status: 404 });
   }

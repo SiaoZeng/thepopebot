@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, horizontalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable';
+import { restrictToHorizontalAxis } from '@dnd-kit/modifiers';
 import { CSS } from '@dnd-kit/utilities';
 import { AppSidebar } from '../chat/components/app-sidebar.js';
 import { SidebarProvider, SidebarInset } from '../chat/components/ui/sidebar.js';
@@ -321,7 +322,7 @@ export default function CodePage({ session, codeWorkspaceId }) {
               />
 
               {/* Dynamic tabs — draggable */}
-              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd} modifiers={[restrictToHorizontalAxis]}>
                 <SortableContext items={dynamicTabIds} strategy={horizontalListSortingStrategy}>
                   {tabs.slice(1).map((tab) => (
                     <SortableTab
