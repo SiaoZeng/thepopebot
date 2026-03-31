@@ -192,6 +192,17 @@ See [Different Models](docs/RUNNING_DIFFERENT_MODELS.md) for the full provider r
 
 ---
 
+## Known Issues
+
+### Windows: `SQLITE_IOERR_SHMOPEN`
+
+SQLite can't create or open its shared-memory (`.shm`) file. Common causes:
+
+- **Antivirus** (Windows Defender, etc.) locking the database files — add your project folder to the exclusion list
+- **Cloud-synced folders** (OneDrive, Dropbox, Google Drive) — move your project to a non-synced directory like `C:\Projects\`
+
+---
+
 ## Docs
 
 | Document | Description |
