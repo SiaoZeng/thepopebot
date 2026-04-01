@@ -5,9 +5,12 @@
  *
  * Prompts for domain, DNS provider, API credentials, and server address.
  * Creates the wildcard DNS record via the provider's API.
- * Writes all config to .env and switches COMPOSE_FILE to docker-compose.custom.yml.
+ * Writes SSL config to .env, DNS provider credentials to .env.traefik,
+ * and switches COMPOSE_FILE to docker-compose.custom.yml.
  */
 
+import fs from 'fs';
+import path from 'path';
 import * as clack from '@clack/prompts';
 import { updateEnvVariable } from './lib/auth.mjs';
 import { loadEnvFile } from './lib/env.mjs';
@@ -299,17 +302,21 @@ async function main() {
   updateEnvVariable('SSL_DOMAIN', domain);
   updateEnvVariable('SSL_EMAIL', email);
   updateEnvVariable('SSL_DNS_PROVIDER', provider.traefikName);
-  updateEnvVariable('APP_HOSTNAME', domain);
 
-  // Write provider-specific credentials (standard names — Traefik reads them directly)
-  for (const envVar of provider.envVars) {
-    updateEnvVariable(envVar.key, credentials[envVar.key]);
+  // Set APP_HOSTNAME only if not already set (don't overwrite existing webhook hostname)
+  if (!env.APP_HOSTNAME) {
+    updateEnvVariable('APP_HOSTNAME', domain);
   }
+
+  // Write DNS provider credentials to .env.traefik (Traefik-only, not leaked to other services)
+  const traefikEnvPath = path.join(process.cwd(), '.env.traefik');
+  const traefikLines = provider.envVars.map((v) => `${v.key}=${credentials[v.key]}`);
+  fs.writeFileSync(traefikEnvPath, traefikLines.join('\n') + '\n');
 
   // Switch to custom compose file
   updateEnvVariable('COMPOSE_FILE', 'docker-compose.custom.yml');
 
-  s.stop('Configuration saved to .env');
+  s.stop('Configuration saved to .env and .env.traefik');
 
   // ── Summary ────────────────────────────────────────────────────────
   clack.log.success(

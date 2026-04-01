@@ -1,6 +1,7 @@
 # Credentials - NEVER commit these
 .env
 .env.local
+.env.traefik
 *.pem
 *.key
 

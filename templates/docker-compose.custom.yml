@@ -8,7 +8,9 @@
 #   SSL_DOMAIN          — your domain (e.g., bot.example.com)
 #   SSL_EMAIL           — email for Let's Encrypt notifications
 #   SSL_DNS_PROVIDER    — Traefik DNS provider name (e.g., cloudflare)
-#   Provider API creds  — standard env var names (e.g., CF_DNS_API_TOKEN for Cloudflare)
+#
+# DNS provider API credentials are stored in .env.traefik (created by setup-ssl).
+# Only this file is passed to the Traefik container — not the main .env.
 #
 # DNS: *.${SSL_DOMAIN} must resolve to this server (A record or CNAME).
 # The setup-ssl command can create this record for you.
@@ -28,7 +30,7 @@ services:
       - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
       - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=${SSL_DNS_PROVIDER}
       - --certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers=8.8.8.8:53,8.8.4.4:53
-    env_file: .env
+    env_file: .env.traefik
     ports:
       - "80:80"
       - "443:443"
@@ -60,6 +62,8 @@ services:
       - traefik.http.routers.event-handler.rule=Host(`${APP_HOSTNAME}`)
       - traefik.http.routers.event-handler.entrypoints=websecure
       - traefik.http.routers.event-handler.tls.certresolver=letsencrypt
+      - traefik.http.routers.event-handler.tls.domains[0].main=${SSL_DOMAIN}
+      - traefik.http.routers.event-handler.tls.domains[0].sans=*.${SSL_DOMAIN}
       - traefik.http.services.event-handler.loadbalancer.server.port=80
     stop_grace_period: 120s
     healthcheck:
