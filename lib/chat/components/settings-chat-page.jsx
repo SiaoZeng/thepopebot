@@ -91,7 +91,7 @@ function ActiveConfig({ settings, onSave }) {
 
   useEffect(() => {
     if (settings?.active) {
-      const prov = settings.active.provider || availableProviders[0]?.slug || '';
+      const prov = settings.active.provider || '';
       const resolved = availableProviders.find((p) => p.slug === prov);
       const models = resolved?.models || [];
       const def = models.find((m) => m.default);
@@ -171,6 +171,9 @@ function ActiveConfig({ settings, onSave }) {
               onChange={(e) => handleProviderChange(e.target.value)}
               className="w-48 rounded-md border border-border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-foreground"
             >
+              {!provider && availableProviders.length > 0 && (
+                <option value="">Select Provider</option>
+              )}
               {availableProviders.map((p) => (
                 <option key={p.slug} value={p.slug}>{p.name}</option>
               ))}

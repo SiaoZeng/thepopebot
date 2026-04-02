@@ -8,6 +8,9 @@
 # Claude Code
 .claude/*
 
+# Playwright MCP
+.playwright-mcp/
+
 # Pi system prompt (generated at runtime from SOUL.md)
 .pi/SYSTEM.md
 
