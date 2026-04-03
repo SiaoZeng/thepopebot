@@ -48,6 +48,9 @@ jobs:
                 cd /project && npx --yes thepopebot@latest init --no-install
               fi
 
+              # Install the new version into node_modules so local CLI stays current
+              cd /project && npm install
+
               # Commit any template changes from init
               git -C /project add -A
               if ! git -C /project diff --cached --quiet; then
