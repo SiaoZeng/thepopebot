@@ -89,7 +89,7 @@ else
 fi
 
 # ── Register Playwright MCP server for browser automation ──
-gemini mcp add playwright npx -y @playwright/mcp@0.0.70 --headless --browser chromium --output-dir /tmp/playwright-output --trust 2>&1 || true
+gemini mcp add playwright npx -y @playwright/mcp@0.0.70 --headless --browser chromium --output-dir /home/coding-agent/workspace/.tmp --trust 2>&1 || true
 
 # Activate agent-job-secrets skill when token is available (agent chat mode only)
 if [ -n "$AGENT_JOB_TOKEN" ]; then

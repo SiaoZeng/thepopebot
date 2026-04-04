@@ -61,7 +61,7 @@ cat > ~/.config/opencode/opencode.json << 'EOF'
   "mcp": {
     "playwright": {
       "type": "local",
-      "command": ["npx", "-y", "@playwright/mcp@0.0.70", "--headless", "--browser", "chromium", "--output-dir", "/tmp/playwright-output"],
+      "command": ["npx", "-y", "@playwright/mcp@0.0.70", "--headless", "--browser", "chromium", "--output-dir", "/home/coding-agent/workspace/.tmp"],
       "enabled": true
     }
   }

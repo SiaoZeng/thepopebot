@@ -40,12 +40,10 @@ export function SidebarHistoryItem({ chat, isActive, onDelete, onStar, onRename 
             setOpenMobile(false);
           }}
         >
-          {chat.chatMode === 'code' ? (
-            <span className="relative">
-              <CodeIcon size={14} />
-              {chat.hasChanges ? <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-destructive" /> : null}
-            </span>
-          ) : <AgentIcon size={14} />}
+          <span className="relative">
+            {chat.chatMode === 'code' ? <CodeIcon size={14} /> : <AgentIcon size={14} />}
+            {chat.hasChanges ? <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-destructive" /> : null}
+          </span>
           <span className="truncate flex-1">
             {chat.title}
           </span>

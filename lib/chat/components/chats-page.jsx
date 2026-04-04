@@ -312,12 +312,10 @@ function ChatRow({ chat, onNavigate, onDelete, onStar, onRename }) {
         }
       }}
     >
-      {chat.chatMode === 'code' ? (
-        <span className="relative">
-          <CodeIcon size={16} />
-          {chat.hasChanges ? <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-destructive" /> : null}
-        </span>
-      ) : <AgentIcon size={16} />}
+      <span className="relative">
+        {chat.chatMode === 'code' ? <CodeIcon size={16} /> : <AgentIcon size={16} />}
+        {chat.hasChanges ? <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-destructive" /> : null}
+      </span>
       <div className="flex-1 min-w-0">
         {editing ? (
           <input

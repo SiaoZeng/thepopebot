@@ -166,20 +166,13 @@ async function handleGetAgentSecret(request) {
   return Response.json({ value: raw });
 }
 
-async function handleSetAgentSecret(request) {
+async function handleListAgentSecrets(request) {
   const record = verifyApiKey(request.headers.get('x-api-key'));
   if (record.type !== 'agent_job_api_key') {
     return Response.json({ error: 'Forbidden' }, { status: 403 });
   }
-
-  const body = await request.json();
-  const { key, value } = body;
-  if (!key || typeof value !== 'string') {
-    return Response.json({ error: 'Missing key or value' }, { status: 400 });
-  }
-  const { setAgentJobSecret } = await import('../lib/db/config.js');
-  setAgentJobSecret(key, value, 'agent');
-  return Response.json({ success: true });
+  const { listAgentJobSecrets } = await import('../lib/db/config.js');
+  return Response.json({ secrets: listAgentJobSecrets() });
 }
 
 async function handleTelegramRegister(request) {
@@ -405,7 +398,6 @@ async function POST(request) {
   // Route to handler
   switch (routePath) {
     case '/create-agent-job':     return handleCreateAgentJob(request);
-    case '/set-agent-job-secret':  return handleSetAgentSecret(request);
     case '/telegram/webhook':   return handleTelegramWebhook(request);
     case '/telegram/register':  return handleTelegramRegister(request);
     case '/github/webhook':     return handleGithubWebhook(request);
@@ -424,7 +416,8 @@ async function GET(request) {
   switch (routePath) {
     case '/ping':               return Response.json({ message: 'Pong!' });
     case '/agent-jobs/status':  return handleAgentJobStatus(request);
-    case '/get-agent-job-secret':   return handleGetAgentSecret(request);
+    case '/get-agent-job-secret':     return handleGetAgentSecret(request);
+    case '/agent-job-list-secrets':  return handleListAgentSecrets(request);
     case '/oauth/callback':     return handleOAuthCallback(request);
     default:                    return Response.json({ error: 'Not found' }, { status: 404 });
   }

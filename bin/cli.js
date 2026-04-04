@@ -57,6 +57,7 @@ Commands:
   reset-auth                        Regenerate AUTH_SECRET (invalidates all sessions)
   reset [file]                      Restore a template file (or list available templates)
   reset-all                         Nuclear reset — restore entire project to fresh init state
+  audit                             Show project state vs. package templates (modified/missing/unknown)
   diff [file]                       Show differences between project files and package templates
   sync <path>                       Sync local package to a test install (build, pack, Docker)
   sync --fast <path>                Fast sync — copy source into running container, rebuild .next
@@ -530,6 +531,98 @@ function diff(filePath) {
   }
 }
 
+/**
+ * Audit project state against package templates.
+ * Groups all non-protected files into: matching, modified, missing, unknown.
+ */
+function audit() {
+  const packageDir = path.join(__dirname, '..');
+  const templatesDir = path.join(packageDir, 'templates');
+  const cwd = process.cwd();
+
+  const templateFiles = getTemplateFiles(templatesDir);
+  const matching = [];
+  const modified = [];
+  const missing = [];
+
+  // Check every template file against the project
+  for (const relPath of templateFiles) {
+    const src = path.join(templatesDir, relPath);
+    const outPath = destPath(relPath);
+    const dest = path.join(cwd, outPath);
+
+    if (!fs.existsSync(dest)) {
+      missing.push(outPath);
+    } else {
+      const srcContent = fs.readFileSync(src);
+      const destContent = fs.readFileSync(dest);
+      if (srcContent.equals(destContent)) {
+        matching.push(outPath);
+      } else {
+        modified.push(outPath);
+      }
+    }
+  }
+
+  // Build a set of known template dest paths for lookup
+  const templateDestPaths = new Set(templateFiles.map(f => destPath(f)));
+
+  // Walk the project for unknown files (not in templates, not protected)
+  const unknown = [];
+  function walkProject(dir) {
+    const items = fs.readdirSync(dir, { withFileTypes: true });
+    for (const item of items) {
+      const fullPath = path.join(dir, item.name);
+      const relPath = path.relative(cwd, fullPath);
+      if (isProtected(relPath)) continue;
+      if (item.isDirectory() && !item.isSymbolicLink()) {
+        walkProject(fullPath);
+      } else if (!templateDestPaths.has(relPath)) {
+        unknown.push(relPath);
+      }
+    }
+  }
+  walkProject(cwd);
+
+  // Report
+  console.log('\n  Project audit\n');
+
+  if (modified.length > 0) {
+    console.log(`  Modified (${modified.length}) — template exists, your version differs:`);
+    for (const f of modified) {
+      console.log(`    ${f}`);
+    }
+    console.log('');
+  }
+
+  if (missing.length > 0) {
+    console.log(`  Missing (${missing.length}) — template exists, not in your project:`);
+    for (const f of missing) {
+      console.log(`    ${f}`);
+    }
+    console.log('');
+  }
+
+  if (unknown.length > 0) {
+    console.log(`  Unknown (${unknown.length}) — in your project, no template (reset-all would remove):`);
+    for (const f of unknown) {
+      console.log(`    ${f}`);
+    }
+    console.log('');
+  }
+
+  console.log(`  ${matching.length} file(s) match package templates.`);
+
+  if (modified.length > 0 || missing.length > 0) {
+    console.log('\n  To reset a file:     thepopebot reset <file>');
+    console.log('  To view a diff:      thepopebot diff <file>');
+  }
+  if (unknown.length > 0 || modified.length > 0 || missing.length > 0) {
+    console.log('  To reset everything: thepopebot reset-all');
+  }
+  console.log('');
+}
+
 function copyDirSyncForce(src, dest, templateRelBase = '') {
   fs.mkdirSync(dest, { recursive: true });
   const entries = fs.readdirSync(src, { withFileTypes: true });
@@ -990,6 +1083,9 @@ switch (command) {
     break;
   case 'reset-all':
     await resetAll();
+    break;
+  case 'audit':
+    audit();
     break;
   case 'diff':
     diff(args[0]);

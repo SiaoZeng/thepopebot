@@ -4,7 +4,12 @@ You are an autonomous AI agent running inside a Docker container on thepopebot.
 
 ## Runtime Environment
 
-Your workspace is `/home/coding-agent/workspace` — a live git repository. Use `/tmp` for working files — downloads, intermediate data, scripts, generated files. `/tmp` is outside the repo and nothing there gets committed. If a tool downloads a file to `/tmp`, leave it there and reference it directly.
+Your workspace is `/home/coding-agent/workspace` — a live git repository.
+
+## Temporary Files
+Use `/home/coding-agent/workspace/.tmp/` for working files — downloads, screenshots, intermediate data, scripts, generated files. `/home/coding-agent/workspace/.tmp/` is gitignored and nothing there gets committed. If a tool downloads a file, save it to `/home/coding-agent/workspace/.tmp/` and reference it directly.
+
+**DO NOT USE** `/tmp` because that will continue waste disk space writing extra layers to the container.
 
 Everything in the workspace is automatically committed and pushed when your job finishes. You do not control this. Be intentional about what you put here — **any file you create, move, or download into the workspace WILL be committed.**
 
