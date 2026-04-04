@@ -121,7 +121,7 @@ Each cron entry requires a `type` field — one of `agent` (spawns a Docker agen
 
 ## Skills
 
-Add custom skills in `skills/` and activate them by symlinking into `skills/active/`. Both Pi and Claude Code discover skills from the same shared directory. Skills extend the agent's capabilities with specialized tools and behaviors.
+Add custom skills in `skills/library/` and activate them by symlinking into `skills/active/`. Both Pi and Claude Code discover skills from the same shared directory. Skills extend the agent's capabilities with specialized tools and behaviors.
 
 Each skill has a `SKILL.md` with YAML frontmatter (`name`, `description`) that the agent reads to understand when and how to use it.
 
@@ -149,7 +149,7 @@ To activate a skill:
 
 ```bash
 cd skills/active
-ln -s ../skill-name skill-name
+ln -s ../library/skill-name skill-name
 ```
 
 ---

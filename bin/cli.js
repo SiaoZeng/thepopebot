@@ -284,8 +284,8 @@ async function init() {
   for (const skill of defaultSkills) {
     const symlink = path.join(activeDir, skill);
     if (!fs.existsSync(symlink)) {
-      createDirLink(`../${skill}`, symlink);
-      console.log(`  Created skills/active/${skill} → ../${skill}`);
+      createDirLink(`../library/${skill}`, symlink);
+      console.log(`  Created skills/active/${skill} → ../library/${skill}`);
     }
   }
 

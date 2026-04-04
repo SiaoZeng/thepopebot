@@ -77,7 +77,7 @@ This is the user project structure after running `npx thepopebot init`:
 ├── docker-compose.yml             # Production deployment (Traefik + event handler)
 ├── data/                          # SQLite database and cluster data
 ├── middleware.js                   # Auth middleware (re-exports from thepopebot)
-├── skills/                        # Plugin directories (activate via skills/active/ symlinks)
+├── skills/                        # Plugin directories (skills/library/ + skills/active/ symlinks)
 ├── logs/                          # Per-job directories (agent-job.config.json + session logs)
 ├── next.config.mjs                # Next.js config (wraps withThepopebot)
 ├── instrumentation.js             # Server startup hook (re-exports register)

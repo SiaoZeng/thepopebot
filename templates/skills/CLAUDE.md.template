@@ -1,6 +1,6 @@
 # skills/ — Agent Skills
 
-Skills are lightweight plugins that extend agent abilities. Each skill lives in `skills/<skill-name>/` and is activated by symlinking into `skills/active/`.
+Skills are lightweight plugins that extend agent abilities. Each skill lives in `skills/library/<skill-name>/` and is activated by symlinking into `skills/active/`.
 
 ## How Skills Work
 
@@ -48,12 +48,12 @@ description: One sentence describing what the skill does and when to use it.
 ## Usage
 
 ```bash
-skills/skill-name/script.sh <args>
+skills/library/skill-name/script.sh <args>
 ```
 ```
 
 - The `description` field appears in the system prompt — keep it concise and action-oriented.
-- Use project-root-relative paths in documentation (e.g., `skills/skill-name/script.sh`).
+- Use project-root-relative paths in documentation (e.g., `skills/library/skill-name/script.sh`).
 
 ### Skill Structure
 
@@ -69,7 +69,7 @@ If a skill needs an API key, add it via the admin UI (Settings > Agent Jobs > Se
 
 ```bash
 # Activate
-ln -s ../skill-name skills/active/skill-name
+ln -s ../library/skill-name skills/active/skill-name
 
 # Deactivate
 rm skills/active/skill-name
@@ -84,10 +84,10 @@ The `skills/active/` directory is shared by both agent backends via symlink brid
 ### Simple bash skill (most common)
 
 ```bash
-mkdir skills/my-skill
+mkdir skills/library/my-skill
 ```
 
-**skills/my-skill/SKILL.md:**
+**skills/library/my-skill/SKILL.md:**
 ```markdown
 ---
 name: my-skill
@@ -101,11 +101,11 @@ Requires MY_API_KEY environment variable.
 
 ## Usage
 ```bash
-skills/my-skill/run.sh <args>
+skills/library/my-skill/run.sh <args>
 ```
 ```
 
-**skills/my-skill/run.sh:**
+**skills/library/my-skill/run.sh:**
 ```bash
 #!/bin/bash
 set -euo pipefail
@@ -117,8 +117,8 @@ if [ -z "$MY_API_KEY" ]; then echo "Error: MY_API_KEY not set"; exit 1; fi
 
 Then make it executable and activate:
 ```bash
-chmod +x skills/my-skill/run.sh
-ln -s ../my-skill skills/active/my-skill
+chmod +x skills/library/my-skill/run.sh
+ln -s ../library/my-skill skills/active/my-skill
 ```
 
 ### Node.js skill
@@ -131,4 +131,4 @@ Always build AND test a skill in the same job. Tell the agent to test with real 
 
 ## Default Skills
 
-Check `skills/` for available built-in skills. Activate any you need by symlinking into `skills/active/`.
+Check `skills/library/` for available built-in skills. Activate any you need by symlinking into `skills/active/`.

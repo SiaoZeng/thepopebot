@@ -65,5 +65,5 @@ claude mcp add --transport stdio playwright -- npx -y @playwright/mcp@0.0.70 --h
 
 # Activate agent-job-secrets skill when token is available (agent chat mode only)
 if [ -n "$AGENT_JOB_TOKEN" ]; then
-  ln -sf ../agent-job-secrets skills/active/agent-job-secrets 2>/dev/null || true
+  ln -sf ../library/agent-job-secrets skills/active/agent-job-secrets 2>/dev/null || true
 fi
