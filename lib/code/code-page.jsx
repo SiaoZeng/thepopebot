@@ -356,6 +356,42 @@ export default function CodePage({ session, codeWorkspaceId }) {
                 </div>
               )}
 
+              {/* Active port forwards */}
+              {portForwards.length > 0 && (
+                <div className="flex items-center gap-1">
+                  {portForwards.map((pf) => (
+                    <div
+                      key={pf.port}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium font-mono text-muted-foreground shrink-0 whitespace-nowrap rounded-t-md border border-b-0 border-emerald-500/30 bg-emerald-500/5"
+                    >
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      <span>:{pf.port}</span>
+                      <button
+                        className="hover:text-emerald-400 transition-colors"
+                        onClick={() => window.open(pf.url, '_blank')}
+                        title={`Open ${pf.url}`}
+                      >
+                        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M7 3H3v10h10V9" />
+                          <path d="M10 2h4v4" />
+                          <path d="M14 2L7 9" />
+                        </svg>
+                      </button>
+                      <button
+                        className="hover:text-destructive transition-colors"
+                        onClick={() => handleStopPort(pf.port)}
+                        title="Stop forwarding"
+                      >
+                        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                          <line x1="4" y1="4" x2="12" y2="12" />
+                          <line x1="12" y1="4" x2="4" y2="12" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               {/* Divider between real tabs and + buttons */}
               <div className="self-stretch my-1.5 mx-1 md:mx-4 w-px bg-border shrink-0" />
 
@@ -392,42 +428,6 @@ export default function CodePage({ session, codeWorkspaceId }) {
               >
                 + Port
               </button>
-
-              {/* Active port forwards */}
-              {portForwards.length > 0 && (
-                <div className="flex items-center gap-1 ml-auto">
-                  {portForwards.map((pf) => (
-                    <div
-                      key={pf.port}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium font-mono text-muted-foreground shrink-0 whitespace-nowrap rounded-t-md border border-b-0 border-emerald-500/30 bg-emerald-500/5"
-                    >
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                      <span>:{pf.port}</span>
-                      <button
-                        className="hover:text-emerald-400 transition-colors"
-                        onClick={() => window.open(pf.url, '_blank')}
-                        title={`Open ${pf.url}`}
-                      >
-                        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M7 3H3v10h10V9" />
-                          <path d="M10 2h4v4" />
-                          <path d="M14 2L7 9" />
-                        </svg>
-                      </button>
-                      <button
-                        className="hover:text-destructive transition-colors"
-                        onClick={() => handleStopPort(pf.port)}
-                        title="Stop forwarding"
-                      >
-                        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                          <line x1="4" y1="4" x2="12" y2="12" />
-                          <line x1="12" y1="4" x2="4" y2="12" />
-                        </svg>
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
 
             {/* Tab content panels — all mounted, hidden via display */}
